@@ -1,3 +1,3 @@
 ﻿using Laboratory;
 
-SimpleArrays.Simplearrays();
+SimpleArrays.Task1();
