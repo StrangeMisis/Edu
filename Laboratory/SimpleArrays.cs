@@ -6,6 +6,7 @@ public class SimpleArrays
 {
     public static void Task1()
     {
+        Console.WriteLine("Введите массив: ");
         var arr = ReadArrayD1();
         WriteArrayD1(arr);
         MinMaxArray(arr);
@@ -18,6 +19,101 @@ public class SimpleArrays
         {
             Mode1(arr);
         }
+    }
+
+    public static void Task2()
+    {
+        var arr = ReadArrayD2();
+        WriteArrayD2(arr);
+        MinMaxArrayD2(arr);
+        arr = ReadArrayD2();
+        WriteArrayD2(arr);
+    }
+
+    public static void Task3()
+    {
+        var arr = ReadArrayDS();
+    }
+
+    private static int[][] ReadArrayDS()
+    {
+        Console.WriteLine("Введите количество строк массива");
+        var size = Convert.ToInt32(Console.ReadLine());
+        int[][] arr = new int[size][];
+        for (int i = 0; i < size; i++)
+        {
+            arr[i] = ReadArrayD1();
+        }
+        return arr;
+    }
+
+    public static int[,] ReadArrayD2()
+    {
+        Console.WriteLine("Введите размерность массива");
+        var size = ReadArrayD1();
+        if (size.Length != 2)
+        {
+            Console.WriteLine("Вы ввели неверную размерность");
+            Environment.Exit(3);
+        }
+        Console.WriteLine("Введите двумерный массив: ");
+
+        var arr2 = new int[size[0], size[1]];
+        for (int i = 0; i < size[0]; i++)
+        {
+            var temp = ReadArrayD1();
+            if (temp.Length == size[1])
+            {
+                for (int j = 0; j < temp.Length; j++)
+                {
+                    arr2[i, j] = temp[j];
+                }
+            }
+            else
+            {
+                Console.WriteLine("Вы ввели количество элементов, не соответствующее указанному");
+                Environment.Exit(4);
+            }
+        }
+
+        return arr2;
+    }
+
+    public static void WriteArrayD2(int[,] arr)
+    {
+        for (int i = 0; i < arr.GetLength(0); i++)
+        {
+            for (int j = 0; j < arr.GetLength(1); j++)
+            {
+                Console.Write($"{arr[i, j]} ");
+            }
+            Console.WriteLine();
+        }
+    }
+
+    public static void MinMaxArrayD2(int[,] arr)
+    {
+        var max = arr[0, 0];
+        var min = arr[0, 0];
+        var iMax = "0 0";
+        var iMin = "0 0";
+        for (int i = 0; i < arr.GetLength(0); i++)
+        {
+            for (int j = 0; j < arr.GetLength(1); j++)
+            {
+                if (max < arr[i, j])
+                {
+                    max = arr[i, j];
+                    iMax = $"{i} {j}";
+                }
+                if (min > arr[i, j])
+                {
+                    min = arr[i, j];
+                    iMin = $"{i} {j}";
+                }
+            }
+        }
+        Console.WriteLine($"Max = {max}, num = {iMax} | Min = {min}, num = {iMin}");
     }
 
     public static void Mode1(int[] array)
@@ -66,7 +162,7 @@ public class SimpleArrays
             case 'b':
                 return false;
             default:
-                Console.WriteLine("Такого режима нет");
+                Console.WriteLine("Режим не выбран, заканчиваю работу");
                 Environment.Exit(2);
                 break;
         }
@@ -77,7 +173,7 @@ public class SimpleArrays
 
     public static void WriteArrayD1(int[] a)
     {
-        Console.WriteLine($"[{string.Join(", ", a)}]");
+        Console.WriteLine($"{string.Join(" ", a)}");
     }
 
     public static void MinMaxArray(int[] a)
@@ -99,12 +195,11 @@ public class SimpleArrays
                 iMin = i;
             }
         }
-        Console.WriteLine($"Max = {max}, num = {iMax}| Min = {min}, num = {iMin}");
+        Console.WriteLine($"Max = {max}, num = {iMax} | Min = {min}, num = {iMin}");
     }
 
     public static int[] ReadArrayD1()
     {
-        Console.WriteLine("Введите массив: ");
         var stroke = Console.ReadLine();
         var strokearr = stroke.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         var array = new int[strokearr.Length];
