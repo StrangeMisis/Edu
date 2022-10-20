@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace Laboratory;
 
 public class SimpleArrays
@@ -12,6 +14,36 @@ public class SimpleArrays
         {
             Mode2(arr);
         }
+        else
+        {
+            Mode1(arr);
+        }
+    }
+
+    public static void Mode1(int[] array)
+    {
+        for (int i = 0; i < array.Length; i++)
+        {
+            for (int j = 0; j < array.Length - 1; j++)
+            {
+                if (array[j] > array[j + 1])
+                {
+                    (array[j], array[j + 1]) = (array[j + 1], array[j]);
+                }
+            }
+        }
+        WriteArrayD1(array);
+        for (int i = 0; i < array.Length; i++)
+        {
+            for (int j = 0; j < array.Length - 1; j++)
+            {
+                if (array[j] < array[j + 1])
+                {
+                    (array[j], array[j + 1]) = (array[j + 1], array[j]);
+                }
+            }
+        }
+        WriteArrayD1(array);
     }
 
     public static void Mode2(int[] array)
