@@ -21,6 +21,13 @@ public class SimpleArrays
         }
     }
 
+    public static void Task1T()
+    {
+        Console.WriteLine("Введите массив: ");
+        var arr = ReadArrayD1T();
+        WriteArrayD1(arr);
+    }
+
     public static void Task2()
     {
         var arr = ReadArrayD2();
@@ -44,6 +51,7 @@ public class SimpleArrays
         {
             arr[i] = ReadArrayD1();
         }
+
         return arr;
     }
 
@@ -56,6 +64,7 @@ public class SimpleArrays
             Console.WriteLine("Вы ввели неверную размерность");
             Environment.Exit(3);
         }
+
         Console.WriteLine("Введите двумерный массив: ");
 
         var arr2 = new int[size[0], size[1]];
@@ -87,6 +96,7 @@ public class SimpleArrays
             {
                 Console.Write($"{arr[i, j]} ");
             }
+
             Console.WriteLine();
         }
     }
@@ -106,6 +116,7 @@ public class SimpleArrays
                     max = arr[i, j];
                     iMax = $"{i} {j}";
                 }
+
                 if (min > arr[i, j])
                 {
                     min = arr[i, j];
@@ -113,6 +124,7 @@ public class SimpleArrays
                 }
             }
         }
+
         Console.WriteLine($"Max = {max}, num = {iMax} | Min = {min}, num = {iMin}");
     }
 
@@ -128,6 +140,7 @@ public class SimpleArrays
                 }
             }
         }
+
         WriteArrayD1(array);
         for (int i = 0; i < array.Length; i++)
         {
@@ -139,6 +152,7 @@ public class SimpleArrays
                 }
             }
         }
+
         WriteArrayD1(array);
     }
 
@@ -189,12 +203,14 @@ public class SimpleArrays
                 max = a[i];
                 iMax = i;
             }
+
             if (a[i] < min)
             {
                 min = a[i];
                 iMin = i;
             }
         }
+
         Console.WriteLine($"Max = {max}, num = {iMax} | Min = {min}, num = {iMin}");
     }
 
@@ -211,8 +227,33 @@ public class SimpleArrays
                 Environment.Exit(1);
             }
         }
-        
+
         return array;
+    }
+
+    public static int[] ReadArrayD1T()
+    {
+        string stroke;
+        string[] strokearr;
+        int[] array;
+        var error = true;
+        do
+        {
+            stroke = Console.ReadLine();
+            strokearr = stroke.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            array = new int[strokearr.Length];
+            var flag = true;
+            for (int i = 0; i < strokearr.Length; i++)
+            {
+                if (!int.TryParse(strokearr[i], out array[i]))
+                {
+                    Console.WriteLine("Вы ввели неверное значение элемента массива");
+                    error = false;
+                }
+            }
+            return array;
+        }
+        while (error) ;
     }
 }
 

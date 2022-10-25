@@ -1,8 +1,8 @@
 ﻿using Laboratory;
 using Microsoft.VisualBasic.CompilerServices;
 
-//SimpleArrays.Task1();
-SimpleArrays.Task2();
+SimpleArrays.Task1T();
+//SimpleArrays.Task2();
 
 
 //Dog bobik = new();
