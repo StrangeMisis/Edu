@@ -1,33 +1,61 @@
-using System.Runtime.InteropServices;
-
 namespace Laboratory;
 
 public class SimpleArrays
 {
+    public static void StartMenu()
+    {
+        //Просим пользователя ввести задачу
+        Mode taskMode;
+        do
+        {
+            taskMode = GetTaskMode();
+        }
+        while (Mode.ErrorMode == taskMode);
+        
+        //Просим пользователя ввести режим чтения
+        Mode readMode;
+        do
+        {
+            readMode = GetReadMode();
+        }
+        while (Mode.ErrorMode == readMode);
+
+        switch (taskMode)
+        {
+            case Mode.Task1:
+                Task1();
+                break;
+            case Mode.Task2:
+                Task2();
+                break;
+            case Mode.Task3:
+                Task3();
+                break;
+        }
+    }
+
     public static void Task1()
     {
         Console.WriteLine("Введите массив: ");
-        var arr = ReadArrayD1();
+        var arr = ReadArrayD1Repeatedly();
         WriteArrayD1(arr);
         MinMaxArray(arr);
-        var mode = GetMode();
-        if (!mode)
+        Mode mode;
+        do
         {
-            Mode2(arr);
-        }
-        else
+            mode = GetSortMode();
+        } while (Mode.ErrorMode == mode);
+
+        switch (mode)
         {
-            Mode1(arr);
+            case Mode.MySortMode:
+                MySort(arr);
+                break;
+            case Mode.LibrarySortMode:
+                LibrarySort(arr);
+                break;
         }
     }
-
-    public static void Task1T()
-    {
-        Console.WriteLine("Введите массив: ");
-        var arr = ReadArrayD1T();
-        WriteArrayD1(arr);
-    }
-
     public static void Task2()
     {
         var arr = ReadArrayD2();
@@ -40,48 +68,121 @@ public class SimpleArrays
     public static void Task3()
     {
         var arr = ReadArrayDS();
+        WriteArrayDS(arr);
+        MinMaxArrayDS(arr);
+        GenerateRandomElementInArrayDS(arr);
+        WriteArrayDS(arr);
+
     }
 
     private static int[][] ReadArrayDS()
     {
         Console.WriteLine("Введите количество строк массива");
-        var size = Convert.ToInt32(Console.ReadLine());
+        int size;
+        while (!int.TryParse(Console.ReadLine(), out size))
+        {
+            Console.WriteLine("Неверно заданное количество строк, повторите ввод");
+        }
+
         int[][] arr = new int[size][];
         for (int i = 0; i < size; i++)
         {
-            arr[i] = ReadArrayD1();
+            arr[i] = ReadArrayD1Repeatedly();
         }
 
         return arr;
     }
 
+    public static void WriteArrayDS(int[][] arr)
+    {
+        for (int i = 0; i < arr.GetLength(0); i++)
+        {
+            WriteArrayD1(arr[i]);
+        }
+    }
+
+    public static void GenerateRandomElementInArrayDS(int[][] arr)
+    {
+        Console.WriteLine("Введите индекс элемента");
+        int[] indexes;
+        do
+        {
+            indexes = ReadArrayD1Repeatedly();
+            if (indexes.Length != 2 || (indexes[0] < 0 || indexes[1] < 0) || indexes[0] >= arr.Length || indexes[1] >= arr[indexes[0]].Length)
+            {
+                Console.WriteLine("Вы ввели неверный индекс, повторите ввод");
+            }
+        } 
+        while (indexes.Length != 2 || (indexes[0] < 0 || indexes[1] < 0) || indexes[0] >= arr.Length || indexes[1] >= arr[indexes[0]].Length);
+
+        var randomElement = new Random();
+        arr[indexes[0]][indexes[1]] = randomElement.Next();
+    }
+
+    public static void MinMaxArrayDS(int[][] arr)
+    {
+        var max = arr[0][0];
+        var min = arr[0][0];
+        var iMax = "0 0";
+        var iMin = "0 0";
+        for (int i = 0; i < arr.Length; i++)
+        {
+            for (int j = 0; j < arr[i].Length; j++)
+            {
+                if (max < arr[i][j])
+                {
+                    max = arr[i][j];
+                    iMax = $"{i} {j}";
+                }
+
+                if (min > arr[i][j])
+                {
+                    min = arr[i][j];
+                    iMin = $"{i} {j}";
+                }
+            }
+        }
+
+        Console.WriteLine($"Max = {max}, num = {iMax} | Min = {min}, num = {iMin}");
+    }
+
     public static int[,] ReadArrayD2()
     {
         Console.WriteLine("Введите размерность массива");
-        var size = ReadArrayD1();
-        if (size.Length != 2)
+        int[] size;
+        do
         {
-            Console.WriteLine("Вы ввели неверную размерность");
-            Environment.Exit(3);
-        }
+            size = ReadArrayD1Repeatedly();
+            if (size.Length != 2)
+            {
+                Console.WriteLine("Вы ввели неверную размерность массива, повторите ввод");
+            }
+        } 
+        while (size.Length != 2);
 
         Console.WriteLine("Введите двумерный массив: ");
 
         var arr2 = new int[size[0], size[1]];
+        
+        //Цикл по строкам
         for (int i = 0; i < size[0]; i++)
         {
-            var temp = ReadArrayD1();
-            if (temp.Length == size[1])
+            int[] stroke;
+            
+            //Цикл для проверки размерности строки
+            do
             {
-                for (int j = 0; j < temp.Length; j++)
+                stroke = ReadArrayD1Repeatedly();
+                if (stroke.Length != size[1])
                 {
-                    arr2[i, j] = temp[j];
+                    Console.WriteLine("Вы ввели количество элементов, не соответствующее указанному");
                 }
-            }
-            else
+            } while (stroke.Length != size[1]);
+            
+            //Цикл по элементам строки
+            for (int j = 0; j < stroke.Length; j++)
             {
-                Console.WriteLine("Вы ввели количество элементов, не соответствующее указанному");
-                Environment.Exit(4);
+                arr2[i, j] = stroke[j];
             }
         }
 
@@ -128,7 +229,7 @@ public class SimpleArrays
         Console.WriteLine($"Max = {max}, num = {iMax} | Min = {min}, num = {iMin}");
     }
 
-    public static void Mode1(int[] array)
+    public static void MySort(int[] array)
     {
         for (int i = 0; i < array.Length; i++)
         {
@@ -156,7 +257,7 @@ public class SimpleArrays
         WriteArrayD1(array);
     }
 
-    public static void Mode2(int[] array)
+    public static void LibrarySort(int[] array)
     {
         Array.Sort(array);
         WriteArrayD1(array);
@@ -164,25 +265,60 @@ public class SimpleArrays
         WriteArrayD1(array);
     }
 
-    public static bool GetMode()
+    public static Mode GetSortMode()
     {
-        Console.Write("Выберите режим работы программы - a или b: ");
+        Console.WriteLine("Выберите режим работы программы - a или b: ");
         var choice = Console.ReadKey().KeyChar;
         Console.WriteLine();
         switch (choice)
         {
             case 'a':
-                return true;
+                return Mode.MySortMode;
             case 'b':
-                return false;
+                return Mode.LibrarySortMode;
             default:
-                Console.WriteLine("Режим не выбран, заканчиваю работу");
-                Environment.Exit(2);
-                break;
+                return Mode.ErrorMode;
         }
-
-        return true;
-
+    }
+    
+    public static Mode GetReadMode()
+    {
+        Console.WriteLine("Выберите режим чтения из консоли или файла - kb или fl: ");
+        var choice = Console.ReadLine();
+        if (choice == null)
+        {
+            return Mode.ErrorMode;
+        }
+        switch (choice)
+        {
+            case "kb":
+                return Mode.ConsoleMode;
+            case "fl":
+                return Mode.FileMode;
+            default:
+                return Mode.ErrorMode;
+        }
+    }
+    
+    public static Mode GetTaskMode()
+    {
+        Console.WriteLine("Выберите задание: t1, t2 или t3");
+        var choice = Console.ReadLine();
+        if (choice == null)
+        {
+            return Mode.ErrorMode;
+        }
+        switch (choice)
+        {
+            case "t1":
+                return Mode.Task1;
+            case "t2":
+                return Mode.Task2;
+            case "t3":
+                return Mode.Task3;
+            default:
+                return Mode.ErrorMode;
+        }
     }
 
     public static void WriteArrayD1(int[] a)
@@ -223,7 +359,6 @@ public class SimpleArrays
         {
             if (!int.TryParse(strokearr[i], out array[i]))
             {
-                Console.WriteLine("Вы ввели неверное значение элемента массива");
                 Environment.Exit(1);
             }
         }
@@ -231,29 +366,33 @@ public class SimpleArrays
         return array;
     }
 
-    public static int[] ReadArrayD1T()
+    public static int[] ReadArrayD1Repeatedly()
     {
         string stroke;
         string[] strokearr;
         int[] array;
-        var error = true;
+        bool error;
         do
         {
+            error = false;
             stroke = Console.ReadLine();
             strokearr = stroke.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
             array = new int[strokearr.Length];
-            var flag = true;
             for (int i = 0; i < strokearr.Length; i++)
             {
                 if (!int.TryParse(strokearr[i], out array[i]))
                 {
-                    Console.WriteLine("Вы ввели неверное значение элемента массива");
-                    error = false;
+                    error = true;
                 }
             }
-            return array;
+
+            if (error)
+            {
+                Console.WriteLine("Вы ввели неверное значение массива, повторите ввод");
+            }
         }
-        while (error) ;
+        while (error);
+        return array;
     }
 }
 
