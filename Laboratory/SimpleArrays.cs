@@ -23,49 +23,98 @@ public class SimpleArrays
         switch (taskMode)
         {
             case Mode.Task1:
-                Task1();
+                Task1(readMode);
                 break;
             case Mode.Task2:
-                Task2();
+                Task2(readMode);
                 break;
             case Mode.Task3:
-                Task3();
+                Task3(readMode);
                 break;
         }
     }
 
-    public static void Task1()
+    public static void Task1(Mode readMode)
     {
-        Console.WriteLine("Введите массив: ");
-        var arr = ReadArrayD1Repeatedly();
-        WriteArrayD1(arr);
-        MinMaxArray(arr);
-        Mode mode;
-        do
+        int[] arr;
+        if (readMode == Mode.ConsoleMode)
         {
-            mode = GetSortMode();
-        } while (Mode.ErrorMode == mode);
+            Console.WriteLine("Введите массив: ");
+            arr = ReadArrayD1Repeatedly();
+            WriteArrayD1(arr);
+            MinMaxArray(arr);
+            Mode sortMode;
+            do
+            {
+                sortMode = GetSortMode(readMode, null);
+            } while (Mode.ErrorMode == sortMode);
 
-        switch (mode)
-        {
-            case Mode.MySortMode:
-                MySort(arr);
-                break;
-            case Mode.LibrarySortMode:
-                LibrarySort(arr);
-                break;
+            switch (sortMode)
+            {
+                case Mode.MySortMode:
+                    MySort(arr);
+                    break;
+                case Mode.LibrarySortMode:
+                    LibrarySort(arr);
+                    break;
+            }
         }
+        else
+        {
+            using (var reader = new StreamReader(@"C:\Users\vladi\RiderProjects\Edu\data.txt"))
+            {
+                Mode sortMode;
+
+                sortMode = GetSortMode(readMode, reader);
+                if (sortMode == Mode.ErrorMode)
+                {
+                    ErrorAndExit("Неправильный режим сортировки");
+                }
+
+                arr = ReadArrayD1FromFile(reader);
+                WriteArrayD1(arr);
+                MinMaxArray(arr);
+
+                switch (sortMode)
+                {
+                    case Mode.MySortMode:
+                        MySort(arr);
+                        break;
+                    case Mode.LibrarySortMode:
+                        LibrarySort(arr);
+                        break;
+                }
+                
+            }
+        }
+
     }
-    public static void Task2()
+    public static void Task2(Mode readMode)
     {
-        var arr = ReadArrayD2();
-        WriteArrayD2(arr);
-        MinMaxArrayD2(arr);
-        arr = ReadArrayD2();
-        WriteArrayD2(arr);
+        int[,] arr;
+        if (readMode == Mode.ConsoleMode)
+        {
+            arr = ReadArrayD2();
+            WriteArrayD2(arr);
+            MinMaxArrayD2(arr);
+            arr = ReadArrayD2();
+            WriteArrayD2(arr);
+        }
+        else
+        {
+            using (var reader = new StreamReader(@"C:\Users\vladi\RiderProjects\Edu\data.txt"))
+            {
+                arr = ReadArrayD2FromFile(reader);
+                WriteArrayD2(arr);
+                MinMaxArrayD2(arr);
+                arr = ReadArrayD2FromFile(reader);
+                WriteArrayD2(arr);
+            }
+        }
+        
     }
 
-    public static void Task3()
+    public static void Task3(Mode readMode)
     {
         var arr = ReadArrayDS();
         WriteArrayDS(arr);
@@ -73,6 +122,12 @@ public class SimpleArrays
         GenerateRandomElementInArrayDS(arr);
         WriteArrayDS(arr);
 
+    }
+
+    public static void ErrorAndExit(string message)
+    {
+        Console.WriteLine(message);
+        Environment.Exit(1);
     }
 
     private static int[][] ReadArrayDS()
@@ -146,6 +201,38 @@ public class SimpleArrays
         Console.WriteLine($"Max = {max}, num = {iMax} | Min = {min}, num = {iMin}");
     }
 
+    public static int[,] ReadArrayD2FromFile(StreamReader reader)
+    {
+        int[] size;
+        size = ReadArrayD1FromFile(reader);
+        if (size.Length != 2)
+        {
+            ErrorAndExit("Неверная размерность массива");
+        }
+        
+        var arr2 = new int[size[0], size[1]];
+        
+        //Цикл по строкам
+        for (int i = 0; i < size[0]; i++)
+        {
+            int[] stroke;
+            
+            //Цикл для проверки размерности строки
+            stroke = ReadArrayD1FromFile(reader);
+            if (stroke.Length != size[1])
+            {
+                ErrorAndExit("В строке файла количество элементов, не соответствующее указанному");
+            }
+
+            //Цикл по элементам строки
+            for (int j = 0; j < stroke.Length; j++)
+            {
+                arr2[i, j] = stroke[j];
+            }
+        }
+
+        return arr2;
+    }
     public static int[,] ReadArrayD2()
     {
         Console.WriteLine("Введите размерность массива");
@@ -265,16 +352,23 @@ public class SimpleArrays
         WriteArrayD1(array);
     }
 
-    public static Mode GetSortMode()
+    public static Mode GetSortMode(Mode readMode, StreamReader reader)
     {
-        Console.WriteLine("Выберите режим работы программы - a или b: ");
-        var choice = Console.ReadKey().KeyChar;
-        Console.WriteLine();
+        string? choice;
+        if (readMode == Mode.ConsoleMode)
+        {
+            Console.WriteLine("Выберите режим работы программы - a или b: ");
+            choice = Console.ReadLine();
+        }
+        else
+        {
+            choice = reader.ReadLine();
+        }
         switch (choice)
         {
-            case 'a':
+            case "a":
                 return Mode.MySortMode;
-            case 'b':
+            case "b":
                 return Mode.LibrarySortMode;
             default:
                 return Mode.ErrorMode;
@@ -350,16 +444,20 @@ public class SimpleArrays
         Console.WriteLine($"Max = {max}, num = {iMax} | Min = {min}, num = {iMin}");
     }
 
-    public static int[] ReadArrayD1()
+    public static int[] ReadArrayD1FromFile(StreamReader reader)
     {
-        var stroke = Console.ReadLine();
+        var stroke = reader.ReadLine();
+        if (stroke == null || stroke.Length == 0)
+        {
+            ErrorAndExit("Некорректные данные массива");
+        }
         var strokearr = stroke.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         var array = new int[strokearr.Length];
         for (int i = 0; i < strokearr.Length; i++)
         {
             if (!int.TryParse(strokearr[i], out array[i]))
             {
-                Environment.Exit(1);
+                ErrorAndExit("Некорректные данные массива");
             }
         }
 
